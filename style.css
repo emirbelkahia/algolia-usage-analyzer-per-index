@@ -96,3 +96,32 @@ canvas {
     max-width: 100%;
     height: auto;
 }
+
+.form-note-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px; /* Adjust as needed */
+    margin: 0 auto;
+}
+
+.note {
+    font-size: 0.8em;
+    color: #777;
+    margin-top: 5px;
+    text-align: center;
+    max-width: 500px; /* Adjust as needed to match form's width */
+    margin: 0 auto; /* Center horizontally */
+}
+
+
+.form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
