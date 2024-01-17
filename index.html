@@ -14,17 +14,18 @@
     <div class="container">
         <form id="dataForm" class="form-container">
             <label for="applicationId">Algolia Application ID:</label>
-            <input type="text" id="applicationId" name="applicationId" placeholder="ex: 879Z8AOPDM" required>
+            <input type="text" id="applicationId" name="applicationId" placeholder="e.g. 879Z8AOPDM" pattern="^[A-Z0-9]{10}$" title="Algolia Application ID looks like this NPAQ1H87OA an can be found in your Algolia dashboard" required>
             <br>
             <label for="apiKey">Algolia Usage API Key:</label>
-            <input type="text" id="apiKey" name="apiKey" placeholder="ex: 7769ffff026b0089b98348aaa256889c5" required>
+            <input type="text" id="apiKey" name="apiKey" placeholder="e.g. 7769ffff026b0089b98348aaa256889c5" pattern="^[a-f0-9]{32}$" title="API Key must be a 32-character hexadecimal string and can be found in your Algolia dashboard > API keys scection" required>
             <br>
             <label for="numDays">Number of days:</label>
-            <input type="number" id="numDays" name="numDays" placeholder="ex: 7" required>
+            <input type="number" id="numDays" name="numDays" placeholder="e.g. 7" min="0" max="90" required>
             <br>
             <label for="indices">Indices (comma separated):</label>
-            <input type="text" id="indices" name="indices" placeholder="ex: prod_ecommerce_fr_fr" required>
+            <input type="text" id="indices" name="indices" placeholder="e.g. prod_fr,prod_uk,prod_es" pattern="^[a-zA-Z0-9_\-]+(,[a-zA-Z0-9_\-]+)*$" title="Indices must be comma separated, can include underscores and dashes" required>
             <br>
+            <p class="note">Tip: if you have a long list of indices that you want to analyze, a good tip to avoid having to type them each time is to create a small txt file in which you put all their names. Each time you need this analysis, just copy and paste from this file to the field above.</p>
             <input type="submit" value="Generate Graph">
             <!-- Download Button -->
             <button onclick="downloadChart()" class="download-btn">Download Chart as PNG</button>

@@ -109,10 +109,10 @@ canvas {
 .note {
     font-size: 0.8em;
     color: #777;
-    margin-top: 5px;
     text-align: center;
     max-width: 500px; /* Adjust as needed to match form's width */
     margin: 0 auto; /* Center horizontally */
+    margin-top: 15px;
 }
 
 

@@ -41,6 +41,12 @@ async function getAndDisplayData(numDays, indices, apiKey, applicationId) {
 
             console.log(`Response from Algolia for index '${index}':`, data);
 
+            // Check for invalid credentials
+            if (data.status === 401 && data.message === 'Invalid credentials') {
+                alert("The API key seems invalid, please check your Algolia App ID or Application ID");
+                return;
+            }
+
             if (data.total_search_requests) {
                 let dates = data.total_search_requests.map(record => new Date(record.t).toISOString().split('T')[0]);
                 let counts = data.total_search_requests.map(record => record.v);
@@ -63,8 +69,8 @@ async function getAndDisplayData(numDays, indices, apiKey, applicationId) {
 
 function buildApiUrl(index, startDate, endDate) {
     const baseUrl = "https://usage.algolia.com/1/usage/total_search_requests";
-    const formattedStartDate = startDate.toISOString().split('.')[0] + "Z"; // Format as 'YYYY-MM-DDTHH:MM:SSZ'
-    const formattedEndDate = endDate.toISOString().split('.')[0] + "Z";     // Format as 'YYYY-MM-DDTHH:MM:SSZ'
+    const formattedStartDate = startDate.toISOString().split('.')[0] + "Z";
+    const formattedEndDate = endDate.toISOString().split('.')[0] + "Z";
 
     return `${baseUrl}/${index}?startDate=${formattedStartDate}&endDate=${formattedEndDate}&granularity=daily`;
 }
