@@ -20,59 +20,99 @@ async function getAndDisplayData(numDays, indices, apiKey, applicationId) {
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - numDays * 24 * 60 * 60 * 1000);
 
-    console.log("Preparing to fetch data from Algolia...");
-    console.log("Start Date:", startDate.toISOString());
-    console.log("End Date:", endDate.toISOString());
-
     let indexData = {};
+    let invalidApiKey = false;
 
     for (let index of indices) {
-        const apiUrl = buildApiUrl(index, startDate, endDate);
-        const headers = {
-            "X-Algolia-API-Key": apiKey,
-            "X-Algolia-Application-Id": applicationId
-        };
-
-        console.log(`Fetching data for index ${index} using URL: ${apiUrl}`);
-
-        try {
-            const response = await fetch(apiUrl, { headers: headers });
-            const data = await response.json();
-
-            console.log(`Response from Algolia for index '${index}':`, data);
-
-            // Check for invalid credentials
-            if (data.status === 401 && data.message === 'Invalid credentials') {
-                alert("The API key seems invalid, please check your Algolia App ID or Application ID");
-                return;
-            }
-
-            if (data.total_search_requests) {
-                let dates = data.total_search_requests.map(record => new Date(record.t).toISOString().split('T')[0]);
-                let counts = data.total_search_requests.map(record => record.v);
-                indexData[index] = { dates, counts };
-            } else {
-                console.log(`Error: 'total_search_requests' key not found in response for index: ${index}.`);
-            }
-        } catch (error) {
-            console.error(`Error fetching data for index ${index}:`, error);
+        if (invalidApiKey) {
+            console.log("Invalid API key detected, stopping further requests.");
+            break;
         }
+
+        // Fetch total_search_requests
+        let totalSearchData = await fetchData(
+            buildApiUrl(index, startDate, endDate, "total_search_requests"), 
+            apiKey, 
+            applicationId, 
+            index, 
+            "total_search_requests"
+        );
+        if (totalSearchData === null) {
+            invalidApiKey = true;
+            continue;
+        }
+
+        console.log(`Total search requests for index ${index}:`, totalSearchData.counts);
+
+        // Fetch querysuggestions_total_search_requests
+        let querySuggestionData = await fetchData(
+            buildApiUrl(index, startDate, endDate, "querysuggestions_total_search_requests"), 
+            apiKey, 
+            applicationId, 
+            index, 
+            "querysuggestions_total_search_requests"
+        );
+        if (querySuggestionData === null) {
+            invalidApiKey = true;
+            continue;
+        }
+
+        console.log(`Query suggestions for index ${index}:`, querySuggestionData.counts);
+
+        // Subtract query suggestions counts from total search requests counts
+        let adjustedCounts = totalSearchData.counts.map((count, i) => {
+            let adjustedCount = count - (querySuggestionData.counts[i] || 0);
+            console.log(`Index ${index} - Date: ${totalSearchData.dates[i]}, Total: ${count}, Suggestions: ${querySuggestionData.counts[i] || 0}, Adjusted: ${adjustedCount}`);
+            return adjustedCount;
+        });
+
+        indexData[index] = { dates: totalSearchData.dates, counts: adjustedCounts };
     }
 
     if (Object.keys(indexData).length > 0) {
-        console.log("Rendering chart with the following data:", indexData);
         renderChart(indexData);
     } else {
         console.log("No data to plot.");
     }
 }
 
-function buildApiUrl(index, startDate, endDate) {
-    const baseUrl = "https://usage.algolia.com/1/usage/total_search_requests";
+async function fetchData(apiUrl, apiKey, applicationId, index, metric) {
+    const headers = {
+        "X-Algolia-API-Key": apiKey,
+        "X-Algolia-Application-Id": applicationId
+    };
+
+    try {
+        const response = await fetch(apiUrl, { headers: headers });
+        const data = await response.json();
+
+        console.log(`Full API response for index '${index}':`, data);
+
+        if (data.status === 401 && data.message === 'Invalid credentials') {
+            alert("The API key seems invalid, please check your Algolia App ID or Application ID");
+            return null; 
+        }
+
+        if (data[metric]) {
+            let dates = data[metric].map(record => new Date(record.t).toISOString().split('T')[0]);
+            let counts = data[metric].map(record => record.v);
+            return { dates, counts };
+        } else {
+            console.log(`Error: '${metric}' key not found in response for index: ${index}.`);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching data for index ${index}:`, error);
+        return null;
+    }
+}
+
+function buildApiUrl(index, startDate, endDate, metric = "total_search_requests") {
+    const baseUrl = "https://usage.algolia.com/1/usage";
     const formattedStartDate = startDate.toISOString().split('.')[0] + "Z";
     const formattedEndDate = endDate.toISOString().split('.')[0] + "Z";
 
-    return `${baseUrl}/${index}?startDate=${formattedStartDate}&endDate=${formattedEndDate}&granularity=daily`;
+    return `${baseUrl}/${metric}/${index}?startDate=${formattedStartDate}&endDate=${formattedEndDate}&granularity=daily`;
 }
 
 let myChart = null; // Global variable to keep track of the chart
