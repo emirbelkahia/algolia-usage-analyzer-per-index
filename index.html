@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Algolia Data Visualization</title>
+    <title>Algolia Usage Analyzer per Index</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -12,6 +12,11 @@
     </header>
 
     <div class="container">
+        <!-- Warning message -->
+        <p class="warning">
+            🙋‍♀️ Dear user, be warned 🙋‍♀️ </br></br>
+            This tool only displays data for <a href="https://www.algolia.com/doc/api-reference/api-methods/search/">single query traffic</a>. <a href="https://www.algolia.com/doc/api-reference/api-methods/multiple-queries/">Multi-query traffic</a>, which may target multiple indices simultaneously, cannot, by design, be accurately attributed to specific indices and hence is not included in the chart.
+        </p>
         <form id="dataForm" class="form-container">
             <label for="applicationId">Algolia Application ID:</label>
             <input type="text" id="applicationId" name="applicationId" placeholder="e.g. 879Z8AOPDM" pattern="^[A-Z0-9]{10}$" title="Algolia Application ID looks like this NPAQ1H87OA an can be found in your Algolia dashboard" required>
@@ -19,7 +24,7 @@
             <label for="apiKey">Algolia Usage API Key:</label>
             <input type="text" id="apiKey" name="apiKey" placeholder="e.g. 7769ffff026b0089b98348aaa256889c5" pattern="^[a-f0-9]{32}$" title="API Key must be a 32-character hexadecimal string and can be found in your Algolia dashboard > API keys scection" required>
             <br>
-            <label for="numDays">Number of days:</label>
+            <label for="numDays">Number of days (max 90):</label>
             <input type="number" id="numDays" name="numDays" placeholder="e.g. 7" min="0" max="90" required>
             <br>
             <label for="indices">Indices (comma separated):</label>

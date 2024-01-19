@@ -110,7 +110,7 @@ canvas {
     font-size: 0.8em;
     color: #777;
     text-align: center;
-    max-width: 500px; /* Adjust as needed to match form's width */
+    max-width: 500px;
     margin: 0 auto; /* Center horizontally */
     margin-top: 15px;
 }
@@ -125,3 +125,12 @@ canvas {
     text-align: center;
     width: 100%;
 }
+
+.warning {
+    color: #007bff; /* Blue color for attention */
+    max-width: 500px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
